@@ -1,0 +1,112 @@
+{
+    "meta": {
+        "flag": "🇵🇹",
+        "name": "Português"
+    },
+    "commands": {
+        "start": "Olá {{userName}}! 👋 Bem-vindo ao bot. 💼"
+    },
+    "ui": {
+        "main_menu": "📋 Menu principal:",
+        "slow_down": "⏳ Por favor, aguarde um momento.",
+        "too_many_requests": "🚫 Muitas solicitações. Por favor, tente novamente em alguns segundos."
+    },
+    "buttons": {
+        "back_to_main": "↩ Voltar ao Menu Principal",
+        "back_to_settings": "↩ Voltar às Configurações",
+        "back_to_wallet": "↩ Voltar para {{walletLabel}}",
+        "back_to_wallets": "↩ Voltar para Carteiras",
+        "cancel": "❌ Cancelar",
+        "change_bot_language": "🌐 Alterar Idioma do Bot",
+        "change_name": "✏️ Alterar Nome",
+        "create_wallet": "➕ Criar Carteira",
+        "delete_wallet": "🗑️ Excluir Carteira",
+        "deposit": "📥 Depositar",
+        "my_wallets": "👛 Minhas Carteiras",
+        "see_on_tronscan": "🔗 Ver no TronScan",
+        "settings": "⚙️ Configurações",
+        "transactions": "🧾 Transações",
+        "withdraw": "📤 Sacar"
+    },
+    "wallet": {
+        "general": {
+            "access_denied": "❌ Acesso negado. Carteira não encontrada ou você não tem permissão.",
+            "address": "Endereço: `{{address}}`",
+            "balance": "Saldo: {{balance}}",
+            "balance_amount": "💰 Seu saldo atual: {{amount}} TRX",
+            "balance_check_error": "❌ Erro ao verificar o saldo. Por favor, tente novamente.",
+            "balance_insufficient": "❌ Saldo insuficiente. Você precisa de pelo menos 2 TRX para taxas de transação.",
+            "choose_wallet": "Escolha uma carteira ou crie uma nova:",
+            "created_at": "Criada em: {{created}}"
+        },
+        "create": {
+            "creating": "⏳ Criando carteira...",
+            "failed": "❌ Falha ao criar carteira. Por favor, tente novamente.",
+            "success": "✅ Carteira criada com sucesso!\n\n🏷️ Etiqueta: {{label}}\n📬 Endereço: `{{address}}`"
+        },
+        "deposit": {
+            "message": "💰 Depósito em {{walletLabel}}\n\n📬 Endereço: `{{address}}`\n\nEnvie TRX para este endereço para adicionar fundos.",
+            "qr_error": "❌ Erro ao gerar código QR. Por favor, use o endereço acima."
+        },
+        "withdrawal": {
+            "address_received": "✅ Endereço recebido: `{{address}}`",
+            "available_balance": "Saldo disponível: {{amount}} TRX",
+            "balance_error": "❌ Erro ao verificar o saldo. Por favor, tente novamente.",
+            "cancelled": "❌ Saque cancelado.",
+            "different_address": "Por favor, envie um endereço de destino diferente:",
+            "enter_address": "Por favor, envie o endereço Tron de destino (deve começar com T):",
+            "enter_amount": "Quantos TRX você gostaria de sacar? (Exemplo: 1.5 ou 10)",
+            "failed": "❌ Falha no saque. Por favor, tente novamente.",
+            "fee_note": "💡 Lembre-se: você deve manter pelo menos 2 TRX para taxas de transação.",
+            "from": "💸 Sacar de: {{walletLabel}}",
+            "insufficient_balance": "❌ Saldo insuficiente. Valor máximo sacável: {{amount}} TRX",
+            "invalid_address": "❌ Endereço Tron inválido. Por favor, envie um válido (deve começar com T):",
+            "invalid_amount": "❌ Valor inválido. Por favor, insira um número válido (exemplo: 1.5 ou 10):",
+            "processing": "⏳ Processando saque...",
+            "same_address": "❌ Você não pode enviar para o mesmo endereço da carteira.",
+            "success": "✅ Saque concluído com sucesso!",
+            "to": "Para: `{{toAddress}}`",
+            "transaction": "Transação: `{{txHash}}`"
+        },
+        "transactions": {
+            "amount": "Valor:",
+            "date": "Data:",
+            "error": "❌ Erro ao carregar transações.",
+            "history_title": "📊 Histórico de Transações (Últimas {{count}})",
+            "loading": "📊 Carregando transações...",
+            "none_found": "📊 Nenhuma transação encontrada para esta carteira.",
+            "received": "⬇️ Recebido",
+            "sent": "⬆️ Enviado"
+        },
+        "label": {
+            "cancelled": "❌ Alteração de nome cancelada.",
+            "current_name": "Nome atual: {{name}}",
+            "empty_error": "❌ O nome não pode estar vazio. Por favor, envie um válido:",
+            "enter_new_name": "Por favor, envie o novo nome para esta carteira:",
+            "failed": "❌ Falha ao atualizar o nome da carteira. Por favor, tente novamente.",
+            "new_name": "Novo nome: {{name}}",
+            "success": "✅ Nome da carteira atualizado com sucesso!",
+            "title": "✏️ Alterar Nome da Carteira",
+            "too_long_error": "❌ O nome é muito longo. Máximo de 20 caracteres. Por favor, envie um mais curto:"
+        },
+        "delete": {
+            "balance": "Saldo: {{balance}} TRX",
+            "balance_error": "❌ Erro ao carregar o saldo. Por favor, tente novamente.",
+            "cancel_action": "❌ Exclusão cancelada.",
+            "cancelled": "❌ Exclusão cancelada. Você não digitou \"{{walletLabel}}\".",
+            "confirm_prompt": "Se tiver certeza, digite \"{{walletLabel}}\" para confirmar:",
+            "confirm_title": "⚠️ Tem certeza de que deseja excluir esta carteira?",
+            "failed": "❌ Falha ao excluir carteira. Por favor, tente novamente.",
+            "irreversible": "🚨 Esta ação não pode ser desfeita.",
+            "name": "Nome: {{name}}",
+            "success": "✅ Carteira \"{{walletLabel}}\" excluída com sucesso."
+        }
+    },
+    "settings": {
+        "choose_language": "🌐 Escolha seu idioma:",
+        "language_change_error": "❌ Erro ao alterar o idioma. Por favor, tente novamente.",
+        "language_change_invalid": "❌ Código de idioma inválido.",
+        "language_changed": "✅ Idioma alterado para {{language}}."
+    }
+}
+

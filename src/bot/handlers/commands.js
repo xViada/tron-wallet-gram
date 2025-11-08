@@ -3,7 +3,7 @@
  */
 
 const db = require('../../database');
-const { mainKeyboard } = require('../keyboards');
+const { getMainKeyboard } = require('../keyboards');
 const {safeEditOrSend} = require('../../utils/messages');
 
 /**
@@ -14,7 +14,7 @@ async function handleStart(ctx) {
 	db.addUser(user);
 	
 	const userName = user.first_name || 'there';
-	await safeEditOrSend(ctx, `Hello ${userName}! Welcome to the bot.`, mainKeyboard);
+	await safeEditOrSend(ctx, ctx.t('commands.start', { userName }), getMainKeyboard(ctx));
 }
 
 module.exports = { handleStart };

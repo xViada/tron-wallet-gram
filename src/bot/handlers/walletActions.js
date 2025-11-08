@@ -4,10 +4,10 @@
 
 const db = require('../../database');
 const { getBalance, generateWallet, generateQRCode, getAllTransactions, formatTransaction } = require('../../services/tron');
-const { getWalletsKeyboard, backToWalletsKeyboard, getWalletKeyboard, getBackToWalletAndWalletsKeyboard } = require('../keyboards');
+const { getWalletsKeyboard, getBackToWalletsKeyboard, getWalletKeyboard, getBackToWalletAndWalletsKeyboard, getMainKeyboard } = require('../keyboards');
 const { sanitizeLabel } = require('../../utils/sanitize');
 const { sunToTRX, validateWalletOwnership, hasSufficientBalance} = require('../../utils/wallet');
-const { formatWalletInfo, formatWalletInfoError, formatDepositMessage, formatTransactionHistory, safeEditOrSend, safeDeleteMessage } = require('../../utils/messages');
+const { formatWalletInfo, formatWalletInfoError, formatDepositMessage, formatTransactionHistory, safeEditOrSend, safeDeleteMessage, escapeMarkdown } = require('../../utils/messages');
 const { toUserMessage } = require('../../utils/errors');
 const logger = require('../../utils/logger');
 
@@ -18,9 +18,9 @@ async function handleWallets(ctx) {
 	await ctx.answerCbQuery();
 	const userId = ctx.from.id;
 	const wallets = db.getWalletsByUser(userId);
-	const keyboard = getWalletsKeyboard(wallets);
+	const keyboard = getWalletsKeyboard(ctx, wallets);
 	
-	await safeEditOrSend(ctx, 'Choose a wallet or create a new one:', keyboard);
+	await safeEditOrSend(ctx, ctx.t('wallet.general.choose_wallet'), keyboard);
 }
 
 /**
@@ -28,8 +28,7 @@ async function handleWallets(ctx) {
  */
 async function handleMain(ctx) {
 	await ctx.answerCbQuery();
-	const { mainKeyboard } = require('../keyboards');
-	await safeEditOrSend(ctx, 'Main menu:', mainKeyboard);
+	await safeEditOrSend(ctx, ctx.t('ui.main_menu'), getMainKeyboard(ctx));
 }
 
 /**
@@ -37,7 +36,7 @@ async function handleMain(ctx) {
  */
 async function handleCreateWallet(ctx) {
 	await ctx.answerCbQuery();
-	await safeEditOrSend(ctx, 'Creating wallet...');
+	await safeEditOrSend(ctx, ctx.t('wallet.create.creating'));
 	try {
 		const userId = ctx.from.id;
 		const account = await generateWallet();
@@ -57,14 +56,14 @@ async function handleCreateWallet(ctx) {
 		});
 		
 		await safeEditOrSend(ctx,
-			`✅ Wallet created successfully!\nLabel: ${result.label}\nAddress: \`${result.address}\``, 
-			{ parse_mode: 'Markdown', ...backToWalletsKeyboard}
+			ctx.t('wallet.create.success', { label: result.label, address: result.address }), 
+			{ parse_mode: 'Markdown', ...getBackToWalletsKeyboard(ctx)}
 		);
 	} catch (e) {
 		logger.error('Create wallet failed', { error: e });
 		await safeEditOrSend(ctx,
-			toUserMessage(e, '❌ Failed to create wallet. Please try again.'), 
-			backToWalletsKeyboard
+			toUserMessage(e, ctx.t('wallet.create.failed')), 
+			getBackToWalletsKeyboard(ctx)
 		);
 	}
 }
@@ -79,20 +78,20 @@ async function handleWalletSelect(ctx) {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId) || !wallet) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return;
 	}
-	let message = 'Error getting balance for wallet select';
+	let message = ctx.t('wallet.general.balance_check_error');
 	try {
 		const balance = await getBalance(wallet.address);
 		const balanceInTRX = sunToTRX(balance);
-		message = formatWalletInfo(wallet, balanceInTRX);
+		message = formatWalletInfo(ctx, wallet, balanceInTRX);
 	} catch (e) {
 		logger.error('Error getting balance for wallet select', { error: e, walletId });
-		message = formatWalletInfoError(wallet);
+		message = formatWalletInfoError(ctx, wallet);
 	}
 
-	const keyboard = getWalletKeyboard(wallet);
+	const keyboard = getWalletKeyboard(ctx, wallet);
 	await safeEditOrSend(ctx, message, { parse_mode: 'Markdown', ...keyboard });
 }
 
@@ -125,7 +124,7 @@ async function handleWithdraw(ctx) {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId)) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return;
 	}
 	
@@ -134,21 +133,18 @@ async function handleWithdraw(ctx) {
 		
 		if (!hasSufficientBalance(balance)) {
 			const balanceInTRX = sunToTRX(balance);
-			const keyboard = getBackToWalletAndWalletsKeyboard(wallet);
-			await safeEditOrSend(ctx,
-				`❌ Insufficient balance. You need at least 2 TRX to withdraw (for transaction fees).\n\n` +
-				`Your balance: ${balanceInTRX} TRX`,
-				keyboard
-			);
+			const keyboard = getBackToWalletAndWalletsKeyboard(ctx, wallet);
+			await safeEditOrSend(ctx, ctx.t('wallet.general.balance_insufficient') + '\n\n' + 
+			ctx.t('wallet.general.balance_amount', { amount: balanceInTRX }), keyboard);
 			return;
 		}
 		
 		// Enter withdrawal scene
 		await ctx.scene.enter('withdrawal', { walletId });
 	} catch (e) {
-		const keyboard = getBackToWalletAndWalletsKeyboard(wallet);
+		const keyboard = getBackToWalletAndWalletsKeyboard(ctx, wallet);
 		logger.error('Error checking balance for withdraw flow', { error: e, walletId });
-		await safeEditOrSend(ctx, '❌ Error checking balance. Please try again.', keyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.balance_check_error'), keyboard);
 	}
 }
 
@@ -170,7 +166,7 @@ async function handleChangeLabel(ctx) {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId)) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return;
 	}
 	
@@ -196,19 +192,19 @@ async function handleTransactions(ctx) {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId)) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return;
 	}
 	
 	try {
-		await safeEditOrSend(ctx, '📊 Loading transactions...');
+		await safeEditOrSend(ctx, ctx.t('wallet.transactions.loading'));
 		
 		const transactions = await getAllTransactions(wallet.address, 10);
 		
 		if (transactions.length === 0) {
-			const keyboard = getBackToWalletAndWalletsKeyboard(wallet);
+			const keyboard = getBackToWalletAndWalletsKeyboard(ctx, wallet);
 			await safeEditOrSend(ctx,
-				`📊 Transaction History\n\nNo transactions found for this wallet.`,
+				ctx.t('wallet.transactions.none_found'),
 				keyboard
 			);
 			return;
@@ -217,11 +213,11 @@ async function handleTransactions(ctx) {
 		// Format transactions for display
 		const formattedTxs = transactions.map(tx => ({
 			...tx,
-			formatted: formatTransaction(tx, wallet.address)
+			formatted: formatTransaction(ctx, tx, wallet.address)
 		}));
 
-		const message = formatTransactionHistory(formattedTxs, wallet.address);
-		const keyboard = getBackToWalletAndWalletsKeyboard(wallet);
+		const message = formatTransactionHistory(ctx, formattedTxs);
+		const keyboard = getBackToWalletAndWalletsKeyboard(ctx, wallet);
 		
 		await safeEditOrSend(ctx, message, {
 			...keyboard,
@@ -229,9 +225,9 @@ async function handleTransactions(ctx) {
 		});
 	} catch (error) {
 		logger.error('Error getting transactions', { error, walletId });
-		const keyboard = getBackToWalletAndWalletsKeyboard(wallet);
+		const keyboard = getBackToWalletAndWalletsKeyboard(ctx, wallet);
 		await safeEditOrSend(ctx,
-			toUserMessage(error, '❌ Error loading transactions.'),
+			toUserMessage(error, ctx.t('wallet.transactions.error')),
 			keyboard
 		);
 	}
@@ -247,17 +243,17 @@ async function handleDeposit(ctx) {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId)) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return;
 	}
 	
 	try {
 		const qrBuffer = await generateQRCode(wallet.address);
-		const message = formatDepositMessage(wallet);
+		const message = formatDepositMessage(ctx, wallet);
 		
 		safeDeleteMessage(ctx);
 
-		const keyboard = getBackToWalletAndWalletsKeyboard(wallet);
+		const keyboard = getBackToWalletAndWalletsKeyboard(ctx, wallet);
 		
 		await ctx.replyWithPhoto(
 			{ source: qrBuffer },
@@ -269,12 +265,12 @@ async function handleDeposit(ctx) {
 		);
 	} catch (error) {
 		logger.error('Error generating QR code', { error, walletId });
-		const keyboard = getBackToWalletAndWalletsKeyboard(wallet);
+		const keyboard = getBackToWalletAndWalletsKeyboard(ctx, wallet);
+		const escapedLabel = escapeMarkdown(wallet.label || 'Wallet');
 		await safeEditOrSend(ctx,
-			`💰 Deposit to ${wallet.label || 'Wallet'}\n\n` +
-			`Address: \`${wallet.address}\`\n\n` +
-			`❌ Error generating QR code. Please use the address above.`,
-			keyboard
+			ctx.t('wallet.deposit.message', { walletLabel: escapedLabel, address: wallet.address }) + '\n\n' +
+				ctx.t('wallet.deposit.qr_error'),
+			{ parse_mode: 'Markdown', ...keyboard }
 		);
 	}
 }

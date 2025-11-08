@@ -4,7 +4,7 @@
 
 const { Scenes } = require('telegraf');
 const db = require('../../database');
-const { backToWalletsKeyboard } = require('../keyboards');
+const { getBackToWalletsKeyboard } = require('../keyboards');
 const { safeEditOrSend } = require('../../utils/messages');
 const { sanitizeLabel } = require('../../utils/sanitize');
 const { validateWalletOwnership } = require('../../utils/wallet');
@@ -24,14 +24,14 @@ labelChangeScene.enter(async (ctx) => {
 	if (ctx.scene.state.wallet && ctx.scene.state.walletId) {
 		const wallet = ctx.scene.state.wallet;
 		const cancelKeyboard = Markup.inlineKeyboard([
-			[Markup.button.callback('❌ Cancel', `cancel_change_label_${wallet.id}`)]
+			[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_change_label_${wallet.id}`)]
 		]);
 		
 		const currentLabel = wallet.label || 'Unnamed Wallet';
 		await safeEditOrSend(ctx,
-			`✏️ Change wallet name\n\n` +
-			`Current name: ${currentLabel}\n\n` +
-			`Please send me the new name for this wallet:`,
+			ctx.t('wallet.label.title') + '\n\n' +
+			ctx.t('wallet.label.current_name', { name: currentLabel }) + '\n\n' +
+			ctx.t('wallet.label.enter_new_name'),
 			cancelKeyboard
 		);
 		return; // Don't reinitialize
@@ -41,7 +41,7 @@ labelChangeScene.enter(async (ctx) => {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId)) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return ctx.scene.leave();
 	}
 	
@@ -55,14 +55,14 @@ labelChangeScene.enter(async (ctx) => {
 	});
 	
 	const cancelKeyboard = Markup.inlineKeyboard([
-		[Markup.button.callback('❌ Cancel', `cancel_change_label_${walletId}`)]
+		[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_change_label_${walletId}`)]
 	]);
 	
 	const currentLabel = wallet.label || 'Unnamed Wallet';
 	await safeEditOrSend(ctx,
-		`✏️ Change wallet name\n\n` +
-		`Current name: ${currentLabel}\n\n` +
-		`Please send me the new name for this wallet:`,
+		ctx.t('wallet.label.title') + '\n\n' +
+		ctx.t('wallet.label.current_name', { name: currentLabel }) + '\n\n' +
+		ctx.t('wallet.label.enter_new_name'),
 		cancelKeyboard
 	);
 });
@@ -77,15 +77,15 @@ labelChangeScene.on('text', async (ctx) => {
 	const rawLabel = ctx.message.text.trim();
 
 	const cancelKeyboard = Markup.inlineKeyboard([
-		[Markup.button.callback('❌ Cancel', `cancel_change_label_${walletId}`)]
+		[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_change_label_${walletId}`)]
 	]);
 	
 	if (!rawLabel || rawLabel.length === 0) {
-		return await safeEditOrSend(ctx, '❌ Label cannot be empty. Please send a valid name:', cancelKeyboard);
+		return await safeEditOrSend(ctx, ctx.t('wallet.label.empty_error'), cancelKeyboard);
 	}
 	
 	if (rawLabel.length > 20) {
-		return await safeEditOrSend(ctx, '❌ Label is too long. Maximum 20 characters. Please send a shorter name:', cancelKeyboard);
+		return await safeEditOrSend(ctx, ctx.t('wallet.label.too_long_error'), cancelKeyboard);
 	}
 	
 	const newLabel = sanitizeLabel(rawLabel);
@@ -99,21 +99,21 @@ labelChangeScene.on('text', async (ctx) => {
 			db.clearPendingState(userId, 'label');
 			
 			await safeEditOrSend(ctx,
-				`✅ Wallet name updated successfully!\n\n` +
-				`New name: ${newLabel}`,
-				backToWalletsKeyboard
+				ctx.t('wallet.label.success') + '\n\n' +
+				ctx.t('wallet.label.new_name', { name: newLabel }),
+				getBackToWalletsKeyboard(ctx)
 			);
 			
 			ctx.scene.leave();
 		} else {
-			throw new Error('Failed to update label');
+			throw new Error(ctx.t('wallet.label.failed'));
 		}
 	} catch (error) {
 		logger.error('Label update error', { error, walletId: wallet.id });
 		db.clearPendingState(userId, 'label');
 		await safeEditOrSend(ctx,
-			toUserMessage(error, '❌ Failed to update wallet name. Please try again.'),
-			backToWalletsKeyboard
+			toUserMessage(error, ctx.t('wallet.label.failed')),
+			getBackToWalletsKeyboard(ctx)
 		);
 		ctx.scene.leave();
 	}
@@ -124,7 +124,7 @@ labelChangeScene.action(/^cancel_change_label_(\d+)$/, async (ctx) => {
 	await ctx.answerCbQuery();
 	const userId = ctx.from.id;
 	db.clearPendingState(userId, 'label');
-	await safeEditOrSend(ctx, '❌ Label change cancelled.', backToWalletsKeyboard);
+	await safeEditOrSend(ctx, ctx.t('wallet.label.cancelled'), getBackToWalletsKeyboard(ctx));
 	ctx.scene.leave();
 });
 

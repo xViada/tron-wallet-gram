@@ -1,0 +1,112 @@
+{
+    "meta": {
+        "flag": "🇫🇷",
+        "name": "Français"
+    },
+    "commands": {
+        "start": "Bonjour {{userName}}! 👋 Bienvenue dans le bot. 💼"
+    },
+    "ui": {
+        "main_menu": "📋 Menu principal:",
+        "slow_down": "⏳ Veuillez patienter un instant.",
+        "too_many_requests": "🚫 Trop de demandes. Veuillez réessayer dans quelques secondes."
+    },
+    "buttons": {
+        "back_to_main": "↩ Retour au menu principal",
+        "back_to_settings": "↩ Retour aux paramètres",
+        "back_to_wallet": "↩ Retour à {{walletLabel}}",
+        "back_to_wallets": "↩ Retour aux portefeuilles",
+        "cancel": "❌ Annuler",
+        "change_bot_language": "🌐 Changer la langue du bot",
+        "change_name": "✏️ Changer le nom",
+        "create_wallet": "➕ Créer un portefeuille",
+        "delete_wallet": "🗑️ Supprimer le portefeuille",
+        "deposit": "📥 Déposer",
+        "my_wallets": "👛 Mes portefeuilles",
+        "see_on_tronscan": "🔗 Voir sur TronScan",
+        "settings": "⚙️ Paramètres",
+        "transactions": "🧾 Transactions",
+        "withdraw": "📤 Retirer"
+    },
+    "wallet": {
+        "general": {
+            "access_denied": "❌ Accès refusé. Portefeuille introuvable ou vous n'avez pas la permission.",
+            "address": "Adresse: `{{address}}`",
+            "balance": "Solde: {{balance}}",
+            "balance_amount": "💰 Votre solde actuel: {{amount}} TRX",
+            "balance_check_error": "❌ Erreur lors de la vérification du solde. Veuillez réessayer.",
+            "balance_insufficient": "❌ Solde insuffisant. Vous devez avoir au moins 2 TRX pour les frais de transaction.",
+            "choose_wallet": "Choisissez un portefeuille ou créez-en un nouveau:",
+            "created_at": "Créé le: {{created}}"
+        },
+        "create": {
+            "creating": "⏳ Création du portefeuille...",
+            "failed": "❌ Échec de la création du portefeuille. Veuillez réessayer.",
+            "success": "✅ Portefeuille créé avec succès!\n\n🏷️ Étiquette: {{label}}\n📬 Adresse: `{{address}}`"
+        },
+        "deposit": {
+            "message": "💰 Dépôt dans {{walletLabel}}\n\n📬 Adresse: `{{address}}`\n\nEnvoyez des TRX à cette adresse pour ajouter des fonds.",
+            "qr_error": "❌ Erreur lors de la génération du code QR. Veuillez utiliser l'adresse ci-dessus."
+        },
+        "withdrawal": {
+            "address_received": "✅ Adresse reçue: `{{address}}`",
+            "available_balance": "Solde disponible: {{amount}} TRX",
+            "balance_error": "❌ Erreur lors de la vérification du solde. Veuillez réessayer.",
+            "cancelled": "❌ Retrait annulé.",
+            "different_address": "Veuillez envoyer une adresse de destination différente:",
+            "enter_address": "Veuillez envoyer l'adresse Tron de destination (doit commencer par T):",
+            "enter_amount": "Combien de TRX souhaitez-vous retirer? (Exemple: 1.5 ou 10)",
+            "failed": "❌ Échec du retrait. Veuillez réessayer.",
+            "fee_note": "💡 Rappelez-vous: vous devez conserver au moins 2 TRX pour les frais de transaction.",
+            "from": "💸 Retirer de: {{walletLabel}}",
+            "insufficient_balance": "❌ Solde insuffisant. Montant maximum retirable: {{amount}} TRX",
+            "invalid_address": "❌ Adresse Tron invalide. Veuillez envoyer une adresse valide (doit commencer par T):",
+            "invalid_amount": "❌ Montant invalide. Veuillez entrer un nombre valide (exemple: 1.5 ou 10):",
+            "processing": "⏳ Traitement du retrait...",
+            "same_address": "❌ Vous ne pouvez pas envoyer à la même adresse du portefeuille.",
+            "success": "✅ Retrait complété avec succès!",
+            "to": "À: `{{toAddress}}`",
+            "transaction": "Transaction: `{{txHash}}`"
+        },
+        "transactions": {
+            "amount": "Montant:",
+            "date": "Date:",
+            "error": "❌ Erreur lors du chargement des transactions.",
+            "history_title": "📊 Historique des transactions (Dernières {{count}})",
+            "loading": "📊 Chargement des transactions...",
+            "none_found": "📊 Aucune transaction trouvée pour ce portefeuille.",
+            "received": "⬇️ Reçu",
+            "sent": "⬆️ Envoyé"
+        },
+        "label": {
+            "cancelled": "❌ Changement de nom annulé.",
+            "current_name": "Nom actuel: {{name}}",
+            "empty_error": "❌ Le nom ne peut pas être vide. Veuillez envoyer un nom valide:",
+            "enter_new_name": "Veuillez envoyer le nouveau nom pour ce portefeuille:",
+            "failed": "❌ Échec de la mise à jour du nom du portefeuille. Veuillez réessayer.",
+            "new_name": "Nouveau nom: {{name}}",
+            "success": "✅ Nom du portefeuille mis à jour avec succès!",
+            "title": "✏️ Changer le nom du portefeuille",
+            "too_long_error": "❌ Le nom est trop long. Maximum 20 caractères. Veuillez envoyer un nom plus court:"
+        },
+        "delete": {
+            "balance": "Solde: {{balance}} TRX",
+            "balance_error": "❌ Erreur lors du chargement du solde. Veuillez réessayer.",
+            "cancel_action": "❌ Suppression annulée.",
+            "cancelled": "❌ Suppression annulée. Vous n'avez pas tapé \"{{walletLabel}}\".",
+            "confirm_prompt": "Si vous êtes sûr, tapez \"{{walletLabel}}\" pour confirmer:",
+            "confirm_title": "⚠️ Êtes-vous sûr de vouloir supprimer ce portefeuille?",
+            "failed": "❌ Échec de la suppression du portefeuille. Veuillez réessayer.",
+            "irreversible": "🚨 Cette action ne peut pas être annulée.",
+            "name": "Nom: {{name}}",
+            "success": "✅ Le portefeuille \"{{walletLabel}}\" a été supprimé avec succès."
+        }
+    },
+    "settings": {
+        "choose_language": "🌐 Choisissez votre langue:",
+        "language_change_error": "❌ Erreur lors du changement de langue. Veuillez réessayer.",
+        "language_change_invalid": "❌ Code de langue invalide.",
+        "language_changed": "✅ Langue changée pour {{language}}."
+    }
+}
+

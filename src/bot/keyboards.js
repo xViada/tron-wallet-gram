@@ -1,16 +1,18 @@
 const { Markup } = require('telegraf');
 const { getAvailableLanguages } = require('../utils/getAvailableLanguages');
 
-const mainKeyboard = Markup.inlineKeyboard([
-	[Markup.button.callback('👛 My wallets', 'wallets')],
-	[Markup.button.callback('🧾 Transactions', 'transactions')],
-	[Markup.button.callback('⚙️ Settings', 'settings')],
-]);
+function getMainKeyboard(ctx) {
+	return Markup.inlineKeyboard([
+		[Markup.button.callback(ctx.t('buttons.my_wallets'), 'wallets')],
+		[Markup.button.callback(ctx.t('buttons.transactions'), 'transactions')],
+		[Markup.button.callback(ctx.t('buttons.settings'), 'settings')],
+	]);
+}
 
 /**
  * Generate wallets keyboard dynamically
  */
-function getWalletsKeyboard(wallets) {
+function getWalletsKeyboard(ctx, wallets) {
 	const buttons = [];
 	
 	// Add buttons for each wallet
@@ -33,36 +35,42 @@ function getWalletsKeyboard(wallets) {
 	}
 	
 	// Add action buttons at the end
-	buttons.push([Markup.button.callback('➕ Create wallet', 'create_wallet')]);
-	buttons.push([Markup.button.callback('↩ Back to main', 'main')]);
+	buttons.push([Markup.button.callback(ctx.t('buttons.create_wallet'), 'create_wallet')]);
+	buttons.push([Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')]);
 	
 	return Markup.inlineKeyboard(buttons);
 }
 
 // Keep the static keyboard for backward compatibility or when no wallets exist
-const walletsKeyboard = Markup.inlineKeyboard([
-	[Markup.button.callback('➕ Create wallet', 'create_wallet')],
-	[Markup.button.callback('↩ Back to main', 'main')],
-]);
+function getWalletsKeyboardStatic(ctx) {
+	return Markup.inlineKeyboard([
+		[Markup.button.callback(ctx.t('buttons.create_wallet'), 'create_wallet')],
+		[Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')],
+	]);
+}
 
-const backToWalletsKeyboard = Markup.inlineKeyboard([
-	[Markup.button.callback('↩ Back to wallets', 'wallets')],
-	[Markup.button.callback('↩ Back to main', 'main')],
-]);
+function getBackToWalletsKeyboard(ctx) {
+	return Markup.inlineKeyboard([
+		[Markup.button.callback(ctx.t('buttons.back_to_wallets'), 'wallets')],
+		[Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')],
+	]);
+}
 
-const backToSettingsKeyboard = Markup.inlineKeyboard([
-	[Markup.button.callback('↩ Back to settings', 'settings')],
-	[Markup.button.callback('↩ Back to main', 'main')],
-]);
+function getBackToSettingsKeyboard(ctx) {
+	return Markup.inlineKeyboard([
+		[Markup.button.callback(ctx.t('buttons.back_to_settings'), 'settings')],
+		[Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')],
+	]);
+}
 
 /**
  * Get back to wallet and wallets keyboard
  */
-function getBackToWalletAndWalletsKeyboard(wallet) {
+function getBackToWalletAndWalletsKeyboard(ctx, wallet) {
 	return Markup.inlineKeyboard([
-		[Markup.button.callback(`↩ Back to ${wallet.label}`, `wallet_${wallet.id}`)],
-		[Markup.button.callback('↩ Back to wallets', 'wallets')],
-		[Markup.button.callback('↩ Back to main', 'main')],
+		[Markup.button.callback(ctx.t('buttons.back_to_wallet', { walletLabel: wallet.label }), `wallet_${wallet.id}`)],
+		[Markup.button.callback(ctx.t('buttons.back_to_wallets'), 'wallets')],
+		[Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')],
 	]);
 }
 
@@ -70,53 +78,55 @@ function getBackToWalletAndWalletsKeyboard(wallet) {
 /**
  * Get wallet actions keyboard
  */
-function getWalletKeyboard(wallet) {
+function getWalletKeyboard(ctx, wallet) {
 	return Markup.inlineKeyboard([
-		[Markup.button.callback('Deposit', `deposit_${wallet.id}`)],
-		[Markup.button.callback('Withdraw', `withdraw_${wallet.id}`)],
-		[Markup.button.callback('Transactions', `transactions_${wallet.id}`)],
-		[Markup.button.callback('Delete wallet', `delete_wallet_${wallet.id}`)],
-		[Markup.button.callback('Change name', `change_label_wallet_${wallet.id}`)],
-		[Markup.button.callback('↩ Back to wallets', 'wallets')],
+		[Markup.button.callback(ctx.t('buttons.deposit'), `deposit_${wallet.id}`)],
+		[Markup.button.callback(ctx.t('buttons.withdraw'), `withdraw_${wallet.id}`)],
+		[Markup.button.callback(ctx.t('buttons.transactions'), `transactions_${wallet.id}`)],
+		[Markup.button.callback(ctx.t('buttons.delete_wallet'), `delete_wallet_${wallet.id}`)],
+		[Markup.button.callback(ctx.t('buttons.change_name'), `change_label_wallet_${wallet.id}`)],
+		[Markup.button.callback(ctx.t('buttons.back_to_wallets'), 'wallets')],
 	]);
 }
 
 /**
  * Get successful withdrawal keyboard
  */
-function getSuccesfullWithdrawKeyboard(transaction, wallet) {
+function getSuccesfullWithdrawKeyboard(ctx, transaction, wallet) {
 	return Markup.inlineKeyboard([
-		[Markup.button.url('See on TronScan', `https://shasta.tronscan.org/#/transaction/${transaction}`)],
-		[Markup.button.callback(`↩ Back to ${wallet.label}`, `wallet_${wallet.id}`)],
-		[Markup.button.callback('↩ Back to main', 'main')],
+		[Markup.button.url(ctx.t('buttons.see_on_tronscan'), `https://shasta.tronscan.org/#/transaction/${transaction}`)],
+		[Markup.button.callback(ctx.t('buttons.back_to_wallet', { walletLabel: wallet.label }), `wallet_${wallet.id}`)],
+		[Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')],
 	]);
 }
 
 // Settings keyboard
-const settingsKeyboard = Markup.inlineKeyboard([
-	[Markup.button.callback('Change bot language', 'change_language')],
-	[Markup.button.callback('↩ Back to main', 'main')],
-]);
+function getSettingsKeyboard(ctx) {
+	return Markup.inlineKeyboard([
+		[Markup.button.callback(ctx.t('buttons.change_bot_language'), 'change_language')],
+		[Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')],
+	]);
+}
 
 // Change language keyboard
-function getChangeLanguageKeyboard() {
+function getChangeLanguageKeyboard(ctx) {
 	const buttons = getAvailableLanguages().map(lang => [
 		Markup.button.callback(`${lang.flag} ${lang.name}`, `change_language_${lang.code}`),
 	]);
-	buttons.push([Markup.button.callback('↩ Back to settings', 'settings')]);
+	buttons.push([Markup.button.callback(ctx.t('buttons.back_to_settings'), 'settings')]);
 	return Markup.inlineKeyboard(buttons);
 }
 
 module.exports = { 
-	mainKeyboard, 
-	walletsKeyboard, 
+	getMainKeyboard,
+	getWalletsKeyboardStatic,
 	getWalletsKeyboard, 
-	backToWalletsKeyboard,
+	getBackToWalletsKeyboard,
 	getBackToWalletAndWalletsKeyboard,
 	getWalletKeyboard, 
 	getSuccesfullWithdrawKeyboard,
-	settingsKeyboard,
+	getSettingsKeyboard,
 	getChangeLanguageKeyboard,
-	backToSettingsKeyboard,
+	getBackToSettingsKeyboard,
 };
 

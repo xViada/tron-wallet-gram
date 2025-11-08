@@ -6,7 +6,7 @@ const { Scenes } = require('telegraf');
 const db = require('../../database');
 const { sendTransaction, isValidTronAddress } = require('../../services/tron');
 const { getBalance } = require('../../services/tron');
-const { backToWalletsKeyboard, getSuccesfullWithdrawKeyboard } = require('../keyboards');
+const { getBackToWalletsKeyboard, getSuccesfullWithdrawKeyboard } = require('../keyboards');
 const { sunToTRX, getMaxWithdrawable, validateWalletOwnership } = require('../../utils/wallet');
 const { safeEditOrSend, formatWithdrawalSuccess } = require('../../utils/messages');
 const { toUserMessage } = require('../../utils/errors');
@@ -31,23 +31,23 @@ withdrawalScene.enter(async (ctx) => {
 		const wallet = ctx.scene.state.wallet;
 		const step = ctx.scene.state.step;
 		const cancelKeyboard = Markup.inlineKeyboard([
-			[Markup.button.callback('❌ Cancel', `cancel_withdraw_${wallet.id}`)]
+			[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_withdraw_${wallet.id}`)]
 		]);
 		
 		if (step === STEP_ADDRESS) {
 			// Restored at address step
 			await safeEditOrSend(ctx,
-				`💸 Withdraw from: ${wallet.label || 'Wallet'}\n\n` +
-				`Available balance: ${ctx.scene.state.balanceInTRX} TRX\n\n` +
-				`Please send me the destination Tron address (starting with T):`,
+				ctx.t('wallet.withdrawal.from', { walletLabel: wallet.label || 'Wallet' }) + '\n\n' +
+				ctx.t('wallet.withdrawal.available_balance', { amount: ctx.scene.state.balanceInTRX }) + '\n\n' +
+				ctx.t('wallet.withdrawal.enter_address'),
 				cancelKeyboard
 			);
 		} else if (step === STEP_AMOUNT && ctx.scene.state.toAddress) {
 			// Restored at amount step
 			await safeEditOrSend(ctx,
-				`✅ Address received: \`${ctx.scene.state.toAddress}\`\n\n` +
-				`Available balance: ${ctx.scene.state.balanceInTRX} TRX\n\n` +
-				`How much TRX do you want to withdraw? (Enter amount in TRX, e.g., 1.5 or 10):`,
+				ctx.t('wallet.withdrawal.address_received', { address: ctx.scene.state.toAddress }) + '\n\n' +
+				ctx.t('wallet.withdrawal.available_balance', { amount: ctx.scene.state.balanceInTRX }) + '\n\n' +
+				ctx.t('wallet.withdrawal.enter_amount'),
 				{ parse_mode: 'Markdown', ...cancelKeyboard }
 			);
 		}
@@ -58,7 +58,7 @@ withdrawalScene.enter(async (ctx) => {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId)) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return ctx.scene.leave();
 	}
 	
@@ -80,18 +80,18 @@ withdrawalScene.enter(async (ctx) => {
 		});
 		
 		const cancelKeyboard = Markup.inlineKeyboard([
-			[Markup.button.callback('❌ Cancel', `cancel_withdraw_${walletId}`)]
+			[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_withdraw_${walletId}`)]
 		]);
 		
 		await safeEditOrSend(ctx,
-			`💸 Withdraw from: ${wallet.label || 'Wallet'}\n\n` +
-			`Available balance: ${balanceInTRX} TRX\n\n` +
-			`Please send me the destination Tron address (starting with T):`,
+			ctx.t('wallet.withdrawal.from', { walletLabel: wallet.label || 'Wallet' }) + '\n\n' +
+			ctx.t('wallet.withdrawal.available_balance', { amount: balanceInTRX }) + '\n\n' +
+			ctx.t('wallet.withdrawal.enter_address'),
 			cancelKeyboard
 		);
 	} catch (e) {
 		logger.error('Error checking balance for withdraw flow', { error: e, walletId });
-		await safeEditOrSend(ctx, '❌ Error checking balance. Please try again.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.withdrawal.balance_error'), getBackToWalletsKeyboard(ctx));
 		ctx.scene.leave();
 	}
 });
@@ -103,13 +103,13 @@ withdrawalScene.on('text', async (ctx) => {
 	const userId = ctx.from.id;
 	
 	const cancelKeyboard = Markup.inlineKeyboard([
-		[Markup.button.callback('❌ Cancel', `cancel_withdraw_${wallet.id}`)]
+		[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_withdraw_${wallet.id}`)]
 	]);
 	
 	if (step === STEP_ADDRESS) {
 		// Validate address
 		if (!isValidTronAddress(ctx.message.text)) {
-			return await safeEditOrSend(ctx, '❌ Invalid Tron address. Please send a valid address (starting with T):', cancelKeyboard);
+			return await safeEditOrSend(ctx, ctx.t('wallet.withdrawal.invalid_address'), cancelKeyboard);
 		}
 		
 		const destinationAddress = ctx.message.text.trim();
@@ -117,8 +117,8 @@ withdrawalScene.on('text', async (ctx) => {
 		// Check if user is trying to send to the same wallet
 		if (destinationAddress.toLowerCase() === wallet.address.toLowerCase()) {
 			return await safeEditOrSend(ctx,
-				'❌ You cannot send to the same wallet address.\n\n' +
-				'Please send a different destination address:',
+				ctx.t('wallet.withdrawal.same_address') + '\n\n' +
+				ctx.t('wallet.withdrawal.different_address'),
 				cancelKeyboard
 			);
 		}
@@ -137,9 +137,9 @@ withdrawalScene.on('text', async (ctx) => {
 		});
 		
 		await safeEditOrSend(ctx,
-			`✅ Address received: \`${destinationAddress}\`\n\n` +
-			`Available balance: ${ctx.scene.state.balanceInTRX} TRX\n\n` +
-			`How much TRX do you want to withdraw? (Enter amount in TRX, e.g., 1.5 or 10):`,
+			ctx.t('wallet.withdrawal.address_received', { address: destinationAddress }) + '\n\n' +
+			ctx.t('wallet.withdrawal.available_balance', { amount: ctx.scene.state.balanceInTRX }) + '\n\n' +
+			ctx.t('wallet.withdrawal.enter_amount'),
 			{ parse_mode: 'Markdown', ...cancelKeyboard }
 		);
 		
@@ -148,7 +148,7 @@ withdrawalScene.on('text', async (ctx) => {
 		const amount = parseFloat(ctx.message.text);
 		
 		if (isNaN(amount) || amount <= 0) {
-			return await safeEditOrSend(ctx, '❌ Invalid amount. Please enter a valid number (e.g., 1.5 or 10):', cancelKeyboard);
+			return await safeEditOrSend(ctx, ctx.t('wallet.withdrawal.invalid_amount'), cancelKeyboard);
 		}
 		
 		// Check if amount is less than or equal to available balance (with fee buffer)
@@ -156,15 +156,15 @@ withdrawalScene.on('text', async (ctx) => {
 		
 		if (amount > maxWithdrawable) {
 			return await safeEditOrSend(ctx,
-				`❌ Insufficient balance. Maximum withdrawable amount: ${maxWithdrawable} TRX\n\n` +
-				`(Need to keep 2 TRX for transaction fees)`,
+				ctx.t('wallet.withdrawal.insufficient_balance', { amount: maxWithdrawable }) + '\n\n' +
+				ctx.t('wallet.withdrawal.fee_note'),
 				cancelKeyboard
 			);
 		}
 		
 		// Confirm and execute withdrawal
 		try {
-			await safeEditOrSend(ctx, '⏳ Processing withdrawal...');
+			await safeEditOrSend(ctx, ctx.t('wallet.withdrawal.processing'));
 			
 			const result = await sendTransaction(
 				wallet.private_key,
@@ -174,13 +174,14 @@ withdrawalScene.on('text', async (ctx) => {
 			
 			if (result.result) {
 				const txHash = result.txid;
-				const keyboard = getSuccesfullWithdrawKeyboard(txHash, wallet);
+				 const keyboard = getSuccesfullWithdrawKeyboard(ctx, txHash, wallet);
 				
 				// Clear pending state
 				db.clearPendingState(userId, 'withdrawal');
 				
 				// Edit the processing message we just sent
-				await safeEditOrSend(ctx, formatWithdrawalSuccess(amount, ctx.scene.state.toAddress, txHash));
+				await safeEditOrSend(ctx, formatWithdrawalSuccess(ctx, amount, ctx.scene.state.toAddress, txHash),
+				{ parse_mode: 'Markdown', ...keyboard });
 				
 				// Leave scene
 				ctx.scene.leave();
@@ -191,8 +192,8 @@ withdrawalScene.on('text', async (ctx) => {
 			logger.error('Withdrawal error', { error, walletId: wallet.id });
 			db.clearPendingState(userId, 'withdrawal');
 			await safeEditOrSend(ctx,
-				toUserMessage(error, '❌ Withdrawal failed. Please try again.'),
-				backToWalletsKeyboard
+				toUserMessage(error, ctx.t('wallet.withdrawal.failed')),
+				getBackToWalletsKeyboard(ctx)
 			);
 			ctx.scene.leave();
 		}
@@ -204,7 +205,7 @@ withdrawalScene.action(/^cancel_withdraw_(\d+)$/, async (ctx) => {
 	await ctx.answerCbQuery();
 	const userId = ctx.from.id;
 	db.clearPendingState(userId, 'withdrawal');
-	await safeEditOrSend(ctx, '❌ Withdrawal cancelled.', backToWalletsKeyboard);
+	await safeEditOrSend(ctx, ctx.t('wallet.withdrawal.cancelled'), getBackToWalletsKeyboard(ctx));
 	ctx.scene.leave();
 });
 

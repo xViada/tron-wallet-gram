@@ -4,7 +4,7 @@
  */
 
 const db = require('../../database');
-const { settingsKeyboard, getChangeLanguageKeyboard, backToSettingsKeyboard } = require('../keyboards');
+const { getSettingsKeyboard, getChangeLanguageKeyboard, getBackToSettingsKeyboard } = require('../keyboards');
 const { safeEditOrSend } = require('../../utils/messages');
 const logger = require('../../utils/logger');
 const { getAvailableLanguages } = require('../../utils/getAvailableLanguages');
@@ -14,7 +14,7 @@ const { getAvailableLanguages } = require('../../utils/getAvailableLanguages');
  */
 async function handleSettings(ctx) {
 	await ctx.answerCbQuery();
-	await safeEditOrSend(ctx, '⚙️ Settings:', settingsKeyboard);
+	await safeEditOrSend(ctx, ctx.t('buttons.settings'), getSettingsKeyboard(ctx));
 }
 
 /**
@@ -22,8 +22,8 @@ async function handleSettings(ctx) {
  */
 async function handleChangeLanguage(ctx) {
 	await ctx.answerCbQuery();
-	const keyboard = getChangeLanguageKeyboard();	
-	await safeEditOrSend(ctx, 'Please choose your language:', keyboard);
+	const keyboard = getChangeLanguageKeyboard(ctx);	
+	await safeEditOrSend(ctx, ctx.t('settings.choose_language'), keyboard);
 }
 
 /**
@@ -36,7 +36,7 @@ async function handleLanguageSelection(ctx) {
 	
 	const language = getAvailableLanguages().find(lang => lang.code === languageCode);
 	if (!language) {
-		await safeEditOrSend(ctx, '❌ Invalid language code.', backToSettingsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('settings.language_change_invalid'), getBackToSettingsKeyboard(ctx));
 		return;
 	}
 	try {
@@ -45,20 +45,20 @@ async function handleLanguageSelection(ctx) {
 		
 		if (success) {
 			await safeEditOrSend(ctx,
-				`✅ Language changed to ${language.name}.`,
-				backToSettingsKeyboard
+				ctx.t('settings.language_changed', { language: language.name }),
+				getBackToSettingsKeyboard(ctx)
 			);
 		} else {
 			await safeEditOrSend(ctx,
-				'❌ Failed to update language. Please try again.',
-				backToSettingsKeyboard
+				ctx.t('settings.language_change_error'),
+				getBackToSettingsKeyboard(ctx)
 			);
 		}
 	} catch (e) {
 		logger.error('Error updating language', { error: e, userId, languageCode: language.code });
 		await safeEditOrSend(ctx,
-			'❌ Error updating language. Please try again.',
-			backToSettingsKeyboard
+			ctx.t('settings.language_change_error'),
+			getBackToSettingsKeyboard(ctx)
 		);
 	}
 }

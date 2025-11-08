@@ -3,11 +3,24 @@
  */
 
 /**
+ * Format date in a consistent, bot-friendly format (YYYY-MM-DD HH:MM)
+ */
+function formatDate(date) {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  const hours = String(d.getHours()).padStart(2, '0');
+  const minutes = String(d.getMinutes()).padStart(2, '0');
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
+
+/**
  * Safely edit or send a message (handles edit failures gracefully)
  */
 async function safeEditOrSend(ctx, text, keyboard = null) {
   try {
-    await ctx.editMessageText(text, keyboard);
+    await ctx.editMessageText(ctx.t(text), keyboard);
   } catch (error) {
     // If editing fails, try to delete and send new message
     try {
@@ -15,7 +28,7 @@ async function safeEditOrSend(ctx, text, keyboard = null) {
     } catch (deleteError) {
       // If deletion fails, just continue
     }
-    await ctx.reply(text, keyboard);
+    await ctx.reply(ctx.t(text), keyboard);
   }
 }
 
@@ -33,57 +46,64 @@ async function safeDeleteMessage(ctx) {
 /**
  * Format wallet info message
  */
-function formatWalletInfo(wallet, balanceInTRX) {
+function formatWalletInfo(ctx, wallet, balanceInTRX) {
   return `👛 ${wallet.label || 'Wallet'}\n\n` +
-    `Address: \`${wallet.address}\`\n` +
-    `Balance: ${balanceInTRX} TRX\n` +
-    `Created: ${new Date(wallet.created_at).toLocaleString()}`;
+    ctx.t('wallet.general.address', { address: wallet.address }) + '\n' +
+    ctx.t('wallet.general.balance', { balance: balanceInTRX }) + ' TRX' + '\n' +
+    ctx.t('wallet.general.created_at', { created: formatDate(wallet.created_at) });
 }
 
 /**
  * Format wallet info with error balance
  */
-function formatWalletInfoError(wallet) {
+function formatWalletInfoError(ctx, wallet) {
   return `👛 ${wallet.label || 'Wallet'}\n\n` +
-    `Address: \`${wallet.address}\`\n` +
-    `Balance: Error loading balance\n` +
-    `Created: ${new Date(wallet.created_at).toLocaleString()}`;
+    ctx.t('wallet.general.address', { address: wallet.address }) + '\n' +
+    ctx.t('wallet.general.balance', { balance: 'Error loading balance' }) + '\n' +
+    ctx.t('wallet.general.created_at', { created: formatDate(wallet.created_at) });
+}
+
+/**
+ * Escape Markdown special characters for Telegram
+ */
+function escapeMarkdown(text) {
+  if (!text) return text;
+  // Escape special Markdown characters: _ * [ ] ( ) ~ ` > # + - . !
+  return String(text).replace(/([_*\[\]()~`>#+\-.!])/g, '\\$1');
 }
 
 /**
  * Format deposit message
  */
-function formatDepositMessage(wallet) {
-  return `💰 Deposit to ${wallet.label || 'Wallet'}\n\n` +
-    `Address: \`${wallet.address}\`\n\n` +
-    `Send TRX to this address to deposit funds.`;
+function formatDepositMessage(ctx, wallet) {
+  const escapedLabel = escapeMarkdown(wallet.label || 'Wallet');
+  return ctx.t('wallet.deposit.message', { walletLabel: escapedLabel, address: wallet.address });
 }
 
 /**
  * Format withdrawal success message
  */
-function formatWithdrawalSuccess(amount, toAddress, txHash) {
-  return `✅ Withdrawal successful!\n\n` +
-    `Amount: ${amount} TRX\n` +
-    `To: \`${toAddress}\`\n` +
-    `Transaction: \`${txHash}\``;
+function formatWithdrawalSuccess(ctx, amount, toAddress, txHash) {
+  return ctx.t('wallet.withdrawal.success', { amount: amount }) + '\n\n' +
+    ctx.t('wallet.withdrawal.to', { toAddress: toAddress }) + '\n' +
+    ctx.t('wallet.withdrawal.transaction', { txHash: txHash });
 }
 
 /**
  * Format transaction history message
  */
-function formatTransactionHistory(transactions, walletAddress) {
+function formatTransactionHistory(ctx, transactions) {
   if (transactions.length === 0) {
-    return `📊 Transaction History\n\nNo transactions found for this wallet.`;
+    return ctx.t('wallet.transactions.none_found');
   }
 
-  let message = `📊 Transaction History (Last ${transactions.length})\n\n`;
+  let message = ctx.t('wallet.transactions.history_title', { count: transactions.length }) + '\n\n';
   
   transactions.slice(0, 10).forEach((tx, index) => {
     const formatted = tx.formatted;
     message += `${index + 1}. ${formatted.direction}\n`;
-    message += `   Amount: ${formatted.amount}\n`;
-    message += `   Date: ${formatted.date}\n`;
+    message += `   ${ctx.t('wallet.transactions.amount')} ${formatted.amount}\n`;
+    message += `   ${ctx.t('wallet.transactions.date')} ${formatted.date}\n`;
     message += `   TX: \`${formatted.txID}\`\n\n`;
   });
   
@@ -98,5 +118,6 @@ module.exports = {
   formatDepositMessage,
   formatWithdrawalSuccess,
   formatTransactionHistory,
+  escapeMarkdown,
 };
 

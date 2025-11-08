@@ -27,9 +27,9 @@ function rateLimit({ windowMs = 10000, max = 8, blockMs = 15000 } = {}) {
 		// If user is currently blocked
 		if (entry.blockedUntil && now < entry.blockedUntil) {
 			if (ctx.updateType === 'callback_query') {
-				try { await ctx.answerCbQuery('Slow down, please.', { show_alert: false }); } catch {}
+				try { await ctx.answerCbQuery(ctx.t('ui.slow_down'), { show_alert: false }); } catch {}
 			} else {
-				try { await ctx.reply('⏳ You are sending requests too quickly. Please wait a moment.'); } catch {}
+				try { await ctx.reply(ctx.t('ui.too_many_requests')); } catch {}
 			}
 			return;
 		}
@@ -40,9 +40,9 @@ function rateLimit({ windowMs = 10000, max = 8, blockMs = 15000 } = {}) {
 		if (entry.hits.length >= max) {
 			entry.blockedUntil = now + blockMs;
 			if (ctx.updateType === 'callback_query') {
-				try { await ctx.answerCbQuery('Too many requests. Please wait a moment.', { show_alert: false }); } catch {}
+				try { await ctx.answerCbQuery(ctx.t('ui.slow_down'), { show_alert: false }); } catch {}
 			} else {
-				try { await ctx.reply('❗ Too many requests. Please wait a moment.'); } catch {}
+				try { await ctx.reply(ctx.t('ui.too_many_requests')); } catch {}
 			}
 			return;
 		}

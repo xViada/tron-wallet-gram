@@ -5,7 +5,7 @@
 const { Scenes } = require('telegraf');
 const db = require('../../database');
 const { getBalance } = require('../../services/tron');
-const { backToWalletsKeyboard } = require('../keyboards');
+const { getBackToWalletsKeyboard } = require('../keyboards');
 const { safeEditOrSend } = require('../../utils/messages');
 const { sunToTRX, validateWalletOwnership } = require('../../utils/wallet');
 const { toUserMessage } = require('../../utils/errors');
@@ -24,7 +24,7 @@ walletDeleteScene.enter(async (ctx) => {
 	if (ctx.scene.state.wallet && ctx.scene.state.walletId) {
 		const wallet = ctx.scene.state.wallet;
 		const cancelKeyboard = Markup.inlineKeyboard([
-			[Markup.button.callback('❌ Cancel', `cancel_delete_${wallet.id}`)]
+			[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_delete_${wallet.id}`)]
 		]);
 		
 		try {
@@ -33,16 +33,16 @@ walletDeleteScene.enter(async (ctx) => {
 			const balanceInTRX = sunToTRX(balance);
 			
 			await safeEditOrSend(ctx,
-				`⚠️ Are you sure you want to delete this wallet?\n\n` +
-				`Name: ${wallet.label || 'Unnamed Wallet'}\n` +
-				`Balance: ${balanceInTRX} TRX\n\n` +
-				`⚠️ This action cannot be undone!\n\n` +
-				`If you are sure, type "Yes" to confirm:`,
+				ctx.t('wallet.delete.confirm_title') + '\n\n' +
+				ctx.t('wallet.delete.name', { name: wallet.label || 'Unnamed Wallet' }) + '\n\n' +
+				ctx.t('wallet.delete.balance', { balance: balanceInTRX }) + '\n\n' +
+				ctx.t('wallet.delete.irreversible') + '\n\n' +
+				ctx.t('wallet.delete.confirm_prompt', { walletLabel: wallet.label || 'Unnamed Wallet' }),
 				cancelKeyboard
 			);
 		} catch (e) {
 			logger.error('Error getting balance for delete flow (restored)', { error: e, walletId });
-			await safeEditOrSend(ctx, '❌ Error checking balance. Please try again.', backToWalletsKeyboard);
+			await safeEditOrSend(ctx, ctx.t('wallet.delete.balance_error'), getBackToWalletsKeyboard(ctx));
 			ctx.scene.leave();
 		}
 		return; // Don't reinitialize
@@ -52,7 +52,7 @@ walletDeleteScene.enter(async (ctx) => {
 	const wallet = db.getWalletById(walletId);
 	
 	if (!validateWalletOwnership(wallet, userId)) {
-		await safeEditOrSend(ctx, '❌ Access denied: Wallet not found or you do not have permission.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.general.access_denied'), getBackToWalletsKeyboard(ctx));
 		return ctx.scene.leave();
 	}
 	
@@ -71,20 +71,20 @@ walletDeleteScene.enter(async (ctx) => {
 		});
 		
 		const cancelKeyboard = Markup.inlineKeyboard([
-			[Markup.button.callback('❌ Cancel', `cancel_delete_${walletId}`)]
+			[Markup.button.callback(ctx.t('buttons.cancel'), `cancel_delete_${walletId}`)]
 		]);
 		
 		await safeEditOrSend(ctx,
-			`⚠️ Are you sure you want to delete this wallet?\n\n` +
-			`Name: ${wallet.label || 'Unnamed Wallet'}\n` +
-			`Balance: ${balanceInTRX} TRX\n\n` +
-			`⚠️ This action cannot be undone!\n\n` +
-			`If you are sure, type "Yes" to confirm:`,
+			ctx.t('wallet.delete.confirm_title') + '\n\n' +
+			ctx.t('wallet.delete.name', { name: wallet.label || 'Unnamed Wallet' }) + '\n\n' +
+			ctx.t('wallet.delete.balance', { balance: balanceInTRX }) + '\n\n' +
+			ctx.t('wallet.delete.irreversible') + '\n\n' +
+			ctx.t('wallet.delete.confirm_prompt', { walletLabel: wallet.label || 'Unnamed Wallet' }),
 			cancelKeyboard
 		);
 	} catch (e) {
 		logger.error('Error getting balance for delete flow', { error: e, walletId });
-		await safeEditOrSend(ctx, '❌ Error checking balance. Please try again.', backToWalletsKeyboard);
+		await safeEditOrSend(ctx, ctx.t('wallet.delete.balance_error'), getBackToWalletsKeyboard(ctx));
 		ctx.scene.leave();
 	}
 });
@@ -92,10 +92,10 @@ walletDeleteScene.enter(async (ctx) => {
 // Handle confirmation input
 walletDeleteScene.on('text', async (ctx) => {
 	const wallet = ctx.scene.state.wallet;
-	const confirmation = ctx.message.text.trim();
+	const confirmation = ctx.message.text.trim().toLowerCase();
 	const userId = ctx.from.id;
 	
-	if (confirmation === 'Yes' || confirmation === 'yes') {
+	if (confirmation === wallet.label.toLowerCase()) {
 		try {
 			const success = db.deleteWallet(wallet.id);
 			
@@ -103,19 +103,19 @@ walletDeleteScene.on('text', async (ctx) => {
 				// Clear pending state
 				db.clearPendingState(userId, 'delete');
 				await safeEditOrSend(ctx,
-					`✅ Wallet "${wallet.label || 'Unnamed Wallet'}" was successfully deleted.`,
-					backToWalletsKeyboard
+					ctx.t('wallet.delete.success', { walletLabel: wallet.label || 'Unnamed Wallet' }),
+					getBackToWalletsKeyboard(ctx)
 				);
 				ctx.scene.leave();
 			} else {
-				throw new Error('Failed to delete wallet');
+				throw new Error(ctx.t('wallet.delete.failed'));
 			}
 		} catch (error) {
 			logger.error('Delete wallet error', { error, walletId: wallet.id });
 			db.clearPendingState(userId, 'delete');
 			await safeEditOrSend(ctx,
-				toUserMessage(error, '❌ Failed to delete wallet. Please try again.'),
-				backToWalletsKeyboard
+				toUserMessage(error, ctx.t('wallet.delete.failed')),
+				getBackToWalletsKeyboard(ctx)
 			);
 			ctx.scene.leave();
 		}
@@ -123,8 +123,8 @@ walletDeleteScene.on('text', async (ctx) => {
 		// Clear pending state
 		db.clearPendingState(userId, 'delete');
 		await safeEditOrSend(ctx,
-			`❌ Wallet deletion cancelled. You didn't type "Yes".`,
-			backToWalletsKeyboard
+			ctx.t('wallet.delete.cancelled', { walletLabel: wallet.label || 'Unnamed Wallet' }),
+			getBackToWalletsKeyboard(ctx)
 		);
 		ctx.scene.leave();
 	}
@@ -135,7 +135,7 @@ walletDeleteScene.action(/^cancel_delete_(\d+)$/, async (ctx) => {
 	await ctx.answerCbQuery();
 	const userId = ctx.from.id;
 	db.clearPendingState(userId, 'delete');
-	await safeEditOrSend(ctx, '❌ Delete cancelled.', backToWalletsKeyboard);
+	await safeEditOrSend(ctx, ctx.t('wallet.delete.cancel_action'), getBackToWalletsKeyboard(ctx));
 	ctx.scene.leave();
 });
 

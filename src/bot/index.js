@@ -5,6 +5,7 @@
 const { Telegraf, Scenes, session } = require('telegraf');
 const { getConfig } = require('../config');
 const logger = require('../utils/logger');
+const { i18nMiddleware } = require('./middlewares/i18nMiddleware');
 const { rateLimit } = require('./middlewares/rateLimit');
 const { createSessionStore } = require('./middlewares/sessionStore');
 const { sceneRestorationMiddleware } = require('./middlewares/scenePersistence');
@@ -52,7 +53,8 @@ function createBot() {
 	// Register session middleware FIRST (required for scenes)
 	// Use database-backed session store for persistence
 	bot.use(session({ store: sessionStore }));
-	
+	// Register i18n middleware
+	bot.use(i18nMiddleware);
 	// Register stage middleware (must be after session)
 	bot.use(stage.middleware());
 	

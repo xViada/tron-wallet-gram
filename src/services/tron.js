@@ -1,8 +1,7 @@
 const { TronWeb } = require('tronweb');
 const QRCode = require('qrcode');
 const https = require('https');
-const { AppError, asAppError } = require('../utils/errors');
-const logger = require('../utils/logger');
+const { asAppError } = require('../utils/errors');
 const { getConfig } = require('../config');
 
 const config = getConfig();
@@ -224,9 +223,9 @@ function getTRC20Transactions(baseUrl, address, limit) {
 /**
  * Format transaction for display
  */
-function formatTransaction(tx, address) {
+function formatTransaction(ctx, tx, address) {
   const isIncoming = tx.to && tx.to.toLowerCase() === address.toLowerCase();
-  const direction = isIncoming ? '⬇️ Received' : '⬆️ Sent';
+  const direction = isIncoming ? ctx.t('wallet.transactions.received') : ctx.t('wallet.transactions.sent');
   
   // Handle TRX and TRC20 amounts
   let amount, amountStr;

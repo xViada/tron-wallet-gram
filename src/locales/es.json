@@ -1,0 +1,111 @@
+{
+    "meta": {
+        "flag": "🇪🇸",
+        "name": "Español"
+    },
+    "commands": {
+        "start": "¡Hola {{userName}}! 👋 Bienvenido al bot. 💼"
+    },
+    "ui": {
+        "main_menu": "📋 Menú principal:",
+        "slow_down": "⏳ Por favor, espera un momento.",
+        "too_many_requests": "🚫 Demasiadas solicitudes. Por favor, intenta de nuevo en unos segundos."
+    },
+    "buttons": {
+        "back_to_main": "↩ Volver al menú principal",
+        "back_to_settings": "↩ Volver a configuración",
+        "back_to_wallet": "↩ Volver a {{walletLabel}}",
+        "back_to_wallets": "↩ Volver a billeteras",
+        "cancel": "❌ Cancelar",
+        "change_bot_language": "🌐 Cambiar idioma del bot",
+        "change_name": "✏️ Cambiar nombre",
+        "create_wallet": "➕ Crear billetera",
+        "delete_wallet": "🗑️ Eliminar billetera",
+        "deposit": "📥 Depositar",
+        "my_wallets": "👛 Mis billeteras",
+        "see_on_tronscan": "🔗 Ver en TronScan",
+        "settings": "⚙️ Configuración",
+        "transactions": "🧾 Transacciones",
+        "withdraw": "📤 Retirar"
+    },
+    "wallet": {
+        "general": {
+            "access_denied": "❌ Acceso denegado. No se encontró la billetera o no tienes permisos.",
+            "address": "Dirección: `{{address}}`",
+            "balance": "Saldo: {{balance}}",
+            "balance_amount": "💰 Tu saldo actual: {{amount}} TRX",
+            "balance_check_error": "❌ Error al verificar el saldo. Por favor, intenta de nuevo.",
+            "balance_insufficient": "❌ Saldo insuficiente. Necesitas al menos 2 TRX para cubrir las tarifas de transacción.",
+            "choose_wallet": "Elige una billetera o crea una nueva:",
+            "created_at": "Creada el: {{created}}"
+        },
+        "create": {
+            "creating": "⏳ Creando billetera...",
+            "failed": "❌ Error al crear la billetera. Por favor, intenta de nuevo.",
+            "success": "✅ ¡Billetera creada exitosamente!\n\n🏷️ Etiqueta: {{label}}\n📬 Dirección: `{{address}}`"
+        },
+        "deposit": {
+            "message": "💰 Depósito en {{walletLabel}}\n\n📬 Dirección: `{{address}}`\n\nEnvía TRX a esta dirección para agregar fondos.",
+            "qr_error": "❌ Error al generar el código QR. Por favor, usa la dirección mostrada arriba."
+        },
+        "withdrawal": {
+            "address_received": "✅ Dirección recibida: `{{address}}`",
+            "available_balance": "Saldo disponible: {{amount}} TRX",
+            "balance_error": "❌ Error al verificar el saldo. Por favor, intenta de nuevo.",
+            "cancelled": "❌ Retiro cancelado.",
+            "different_address": "Por favor, envía una dirección de destino diferente:",
+            "enter_address": "Por favor, envía la dirección Tron de destino (debe comenzar con T):",
+            "enter_amount": "¿Cuántos TRX deseas retirar? (Ejemplo: 1.5 o 10)",
+            "failed": "❌ Error al procesar el retiro. Por favor, intenta de nuevo.",
+            "fee_note": "💡 Recuerda: debes mantener al menos 2 TRX para cubrir las tarifas de transacción.",
+            "from": "💸 Retirar desde: {{walletLabel}}",
+            "insufficient_balance": "❌ Saldo insuficiente. Cantidad máxima disponible para retirar: {{amount}} TRX",
+            "invalid_address": "❌ Dirección Tron inválida. Por favor, envía una dirección válida (debe comenzar con T):",
+            "invalid_amount": "❌ Cantidad inválida. Por favor, ingresa un número válido (ejemplo: 1.5 o 10):",
+            "processing": "⏳ Procesando el retiro...",
+            "same_address": "❌ No puedes enviar a la misma dirección de esta billetera.",
+            "success": "✅ ¡Retiro completado exitosamente!",
+            "to": "A: `{{toAddress}}`",
+            "transaction": "Transacción: `{{txHash}}`"
+        },
+        "transactions": {
+            "amount": "Cantidad:",
+            "date": "Fecha:",
+            "error": "❌ Error al cargar las transacciones.",
+            "history_title": "📊 Historial de transacciones (Últimas {{count}})",
+            "loading": "📊 Cargando transacciones...",
+            "none_found": "📊 No se encontraron transacciones para esta billetera.",
+            "received": "⬇️ Recibido",
+            "sent": "⬆️ Enviado"
+        },
+        "label": {
+            "cancelled": "❌ Cambio de nombre cancelado.",
+            "current_name": "Nombre actual: {{name}}",
+            "empty_error": "❌ El nombre no puede estar vacío. Por favor, envía uno válido:",
+            "enter_new_name": "Por favor, envía el nuevo nombre para esta billetera:",
+            "failed": "❌ Error al actualizar el nombre. Por favor, intenta de nuevo.",
+            "new_name": "Nuevo nombre: {{name}}",
+            "success": "✅ ¡Nombre actualizado exitosamente!",
+            "title": "✏️ Cambiar nombre de billetera",
+            "too_long_error": "❌ El nombre es demasiado largo. Máximo 20 caracteres. Por favor, envía uno más corto:"
+        },
+        "delete": {
+            "balance": "Saldo: {{balance}} TRX",
+            "balance_error": "❌ Error al cargar el saldo. Por favor, intenta de nuevo.",
+            "cancel_action": "❌ Eliminación cancelada.",
+            "cancelled": "❌ Eliminación cancelada. No escribiste \"{{walletLabel}}\".",
+            "confirm_prompt": "Si estás seguro, escribe \"{{walletLabel}}\" para confirmar:",
+            "confirm_title": "⚠️ ¿Estás seguro de que deseas eliminar esta billetera?",
+            "failed": "❌ Error al eliminar la billetera. Por favor, intenta de nuevo.",
+            "irreversible": "🚨 Esta acción no se puede deshacer.",
+            "name": "Nombre: {{name}}",
+            "success": "✅ La billetera \"{{walletLabel}}\" fue eliminada exitosamente."
+        }
+    },
+    "settings": {
+        "choose_language": "🌐 Elige tu idioma:",
+        "language_change_error": "❌ Error al cambiar el idioma. Por favor, intenta de nuevo.",
+        "language_change_invalid": "❌ Código de idioma inválido.",
+        "language_changed": "✅ Idioma cambiado a {{language}}."
+    }
+}
