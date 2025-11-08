@@ -20,7 +20,7 @@ Create and manage multiple wallets, send and receive TRX, view transaction histo
 
 - User Experience
 
-    - Multi-language support (In progress)
+    - Multi-language support
     - Interactive keyboards
     - Scene-based workflows
     - Session persistence across restarts
@@ -39,6 +39,7 @@ Create and manage multiple wallets, send and receive TRX, view transaction histo
 - TronWeb for TRON blockchain integration
 - SQLite for data persistence
 - QR Code generation for deposits
+- i18n for internationalization
 
 
 ## Usage
