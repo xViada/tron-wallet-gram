@@ -4,7 +4,8 @@
         "name": "English"
     },
     "commands": {
-        "start": "Hello {{userName}}! 👋 Welcome to the bot. 💼"
+        "start": "Hello {{userName}}! 👋 Welcome to the bot. 💼",
+        "choose_language_welcome": "👋 Welcome! Please choose your preferred language:"
     },
     "ui": {
         "main_menu": "📋 Main menu:",

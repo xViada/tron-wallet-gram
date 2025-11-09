@@ -4,7 +4,7 @@
  */
 
 const db = require('../../database');
-const { getSettingsKeyboard, getChangeLanguageKeyboard, getBackToSettingsKeyboard } = require('../keyboards');
+const { getSettingsKeyboard, getChangeLanguageKeyboard, getBackToSettingsKeyboard, getMainKeyboard } = require('../keyboards');
 const { safeEditOrSend } = require('../../utils/messages');
 const logger = require('../../utils/logger');
 const { getAvailableLanguages } = require('../../utils/getAvailableLanguages');
@@ -44,6 +44,8 @@ async function handleLanguageSelection(ctx) {
 		const success = db.updateUserLanguageCode(userId, language.code);
 		
 		if (success) {
+			const i18next = require('../../config/i18n');
+			ctx.t = (key, options = {}) => i18next.t(key, { lng: language.code, ...options });
 			await safeEditOrSend(ctx,
 				ctx.t('settings.language_changed', { language: language.name }),
 				getBackToSettingsKeyboard(ctx)
@@ -63,8 +65,68 @@ async function handleLanguageSelection(ctx) {
 	}
 }
 
+/**
+ * Handle initial language selection (for new users on first /start)
+ */
+async function handleInitialLanguageSelection(ctx) {
+	await ctx.answerCbQuery();
+	const languageCode = ctx.match[1]; // 'en' or 'es'
+	const userId = ctx.from.id;
+	
+	const language = getAvailableLanguages().find(lang => lang.code === languageCode);
+	if (!language) {
+		// Fallback to English if invalid language
+		db.updateUserLanguageCode(userId, 'en');
+		const i18next = require('../../config/i18n');
+		ctx.t = (key, options = {}) => i18next.t(key, { lng: 'en', ...options });
+		const userName = ctx.from.first_name || 'there';
+		await safeEditOrSend(ctx,
+			ctx.t('commands.start', { userName }),
+			getMainKeyboard(ctx)
+		);
+		return;
+	}
+	
+	try {
+		// Update user's language preference in database
+		const success = db.updateUserLanguageCode(userId, language.code);
+		
+		if (success) {
+			// Update ctx.t to use the new language
+			const i18next = require('../../config/i18n');
+			ctx.t = (key, options = {}) => i18next.t(key, { lng: language.code, ...options });
+			
+			const userName = ctx.from.first_name || 'there';
+			await safeEditOrSend(ctx,
+				ctx.t('commands.start', { userName }),
+				getMainKeyboard(ctx)
+			);
+		} else {
+			// Fallback to English if update failed
+			const i18next = require('../../config/i18n');
+			ctx.t = (key, options = {}) => i18next.t(key, { lng: 'en', ...options });
+			const userName = ctx.from.first_name || 'there';
+			await safeEditOrSend(ctx,
+				ctx.t('commands.start', { userName }),
+				getMainKeyboard(ctx)
+			);
+		}
+	} catch (e) {
+		logger.error('Error updating initial language', { error: e, userId, languageCode: language.code });
+		// Fallback to English on error
+		const i18next = require('../../config/i18n');
+		ctx.t = (key, options = {}) => i18next.t(key, { lng: 'en', ...options });
+		const userName = ctx.from.first_name || 'there';
+		await safeEditOrSend(ctx,
+			ctx.t('commands.start', { userName }),
+			getMainKeyboard(ctx)
+		);
+	}
+}
+
 module.exports = {
 	handleSettings,
 	handleChangeLanguage,
 	handleLanguageSelection,
+	handleInitialLanguageSelection,
 };

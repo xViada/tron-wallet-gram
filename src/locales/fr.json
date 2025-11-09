@@ -4,7 +4,8 @@
         "name": "Français"
     },
     "commands": {
-        "start": "Bonjour {{userName}}! 👋 Bienvenue dans le bot. 💼"
+        "start": "Bonjour {{userName}}! 👋 Bienvenue dans le bot. 💼",
+        "choose_language_welcome": "👋 Bienvenue! Veuillez choisir votre langue préférée:"
     },
     "ui": {
         "main_menu": "📋 Menu principal:",

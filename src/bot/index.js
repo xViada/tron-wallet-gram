@@ -24,7 +24,7 @@ const {
 	handleTransactions,
 	handleDeposit,
 } = require('./handlers/walletActions');
-const { handleSettings, handleChangeLanguage, handleLanguageSelection } = require('./handlers/settingsActions');
+const { handleSettings, handleChangeLanguage, handleLanguageSelection, handleInitialLanguageSelection } = require('./handlers/settingsActions');
 const { withdrawalScene, labelChangeScene, walletDeleteScene } = require('./scenes');
 
 /**
@@ -89,6 +89,7 @@ function createBot() {
 	bot.action('settings', handleSettings);
 	bot.action('change_language', handleChangeLanguage);
 	bot.action(/^change_language_(\w+)$/, handleLanguageSelection);
+	bot.action(/^initial_language_(\w+)$/, handleInitialLanguageSelection);
 	return bot;
 }
 

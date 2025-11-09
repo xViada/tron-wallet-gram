@@ -72,6 +72,7 @@ const insertUser = db.prepare(`
         last_name = excluded.last_name,
         language_code = excluded.language_code
 `);
+const getUserByIdStmt = db.prepare('SELECT * FROM users WHERE user_id = ?');
 const updateUserLanguageCodeStmt = db.prepare('UPDATE users SET language_code = ? WHERE user_id = ?');
 const getUserLanguageCodeStmt = db.prepare('SELECT language_code FROM users WHERE user_id = ?');
 
@@ -141,6 +142,16 @@ const dbFunctions = {
         }
     },
 
+    // Get a user by their user id
+    getUserById(userId) {
+        try {
+            return getUserByIdStmt.get(userId);
+        } catch (error) {
+            logger.error('DB error: getUserById failed', { error, userId });
+            return null;
+        }
+    },
+
     // Update a user language code
     updateUserLanguageCode(userId, languageCode) {
         try {
@@ -155,7 +166,8 @@ const dbFunctions = {
     // Get a user language code
     getUserLanguageCode(userId) {
         try {
-            return getUserLanguageCodeStmt.get(userId).language_code;
+            const result = getUserLanguageCodeStmt.get(userId);
+            return result ? result.language_code : null;
         } catch (error) {
             logger.error('DB error: getUserLanguageCode failed', { error, userId });
             return null;
@@ -225,7 +237,8 @@ const dbFunctions = {
     // Count wallets for a user
     getWalletCountByUser(userId) {
         try {
-            return getWalletCountByUserStmt.get(userId).count;
+            const result = getWalletCountByUserStmt.get(userId);
+            return result ? result.count : 0;
         } catch (error) {
             logger.error('DB error: getWalletCountByUser failed', { error, userId });
             return 0;

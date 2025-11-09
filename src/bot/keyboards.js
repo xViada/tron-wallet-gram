@@ -117,6 +117,14 @@ function getChangeLanguageKeyboard(ctx) {
 	return Markup.inlineKeyboard(buttons);
 }
 
+// Initial language selection keyboard (for new users on first /start)
+function getInitialLanguageKeyboard() {
+	const buttons = getAvailableLanguages().map(lang => [
+		Markup.button.callback(`${lang.flag} ${lang.name}`, `initial_language_${lang.code}`),
+	]);
+	return Markup.inlineKeyboard(buttons);
+}
+
 module.exports = { 
 	getMainKeyboard,
 	getWalletsKeyboardStatic,
@@ -127,6 +135,7 @@ module.exports = {
 	getSuccesfullWithdrawKeyboard,
 	getSettingsKeyboard,
 	getChangeLanguageKeyboard,
+	getInitialLanguageKeyboard,
 	getBackToSettingsKeyboard,
 };
 

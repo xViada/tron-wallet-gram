@@ -4,7 +4,8 @@
         "name": "Português"
     },
     "commands": {
-        "start": "Olá {{userName}}! 👋 Bem-vindo ao bot. 💼"
+        "start": "Olá {{userName}}! 👋 Bem-vindo ao bot. 💼",
+        "choose_language_welcome": "👋 Bem-vindo! Por favor, escolha seu idioma preferido:"
     },
     "ui": {
         "main_menu": "📋 Menu principal:",
