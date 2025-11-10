@@ -27,7 +27,10 @@
         "see_on_tronscan": "🔗 Ver en TronScan",
         "settings": "⚙️ Configuración",
         "transactions": "🧾 Transacciones",
-        "withdraw": "📤 Retirar"
+        "withdraw": "📤 Retirar",
+        "enable_two_factor_auth": "🔒 Habilitar Autenticación de Dos Factores",
+        "disable_two_factor_auth": "🔒 Deshabilitar Autenticación de Dos Factores",
+        "next_step": "🔒 Siguiente Paso"
     },
     "wallet": {
         "general": {
@@ -104,9 +107,25 @@
         }
     },
     "settings": {
-        "choose_language": "🌐 Elige tu idioma:",
-        "language_change_error": "❌ Error al cambiar el idioma. Por favor, intenta de nuevo.",
-        "language_change_invalid": "❌ Código de idioma inválido.",
-        "language_changed": "✅ Idioma cambiado a {{language}}."
+        "language": {
+            "choose_language": "🌐 Elige tu idioma:",
+            "language_change_error": "❌ Error al cambiar el idioma. Por favor, intenta de nuevo.",
+            "language_change_invalid": "❌ Código de idioma inválido.",
+            "language_change_title": "🌐 Cambiar Idioma",
+            "language_changed": "✅ Idioma cambiado a {{language}}."
+        },
+        "two_factor_auth": {
+            "enable_message_first_step": "Por favor, usa tu aplicación de autenticación (por ejemplo, Ente Authenticator, Google Authenticator...) para escanear el código QR.\n\nO ingresa este código manualmente:\n\n`{{secret}}`",
+            "enable_message_second_step": "Por favor, ingresa el código de tu aplicación de autenticación:",
+            "enable_success": "✅ Autenticación de Dos Factores habilitada exitosamente.",
+            "enable_cancelled": "❌ Configuración de Autenticación de Dos Factores cancelada.",
+            "disable_message": "Por favor, ingresa el código de tu aplicación de autenticación:",
+            "disable_cancelled": "❌ Deshabilitación de Autenticación de Dos Factores cancelada.",
+            "disable_success": "✅ Autenticación de Dos Factores deshabilitada exitosamente.",
+            "disable_error": "❌ Error al deshabilitar la Autenticación de Dos Factores. Por favor, intenta de nuevo.",
+            "verification_error": "❌ Error durante la verificación. Por favor, intenta de nuevo.",
+            "invalid_code_format": "❌ Formato de código inválido. Por favor, ingresa un código de 6 dígitos:",
+            "invalid_code": "❌ Código inválido. Por favor, intenta de nuevo:"
+        }
     }
 }

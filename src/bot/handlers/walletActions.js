@@ -3,7 +3,8 @@
  */
 
 const db = require('../../database');
-const { getBalance, generateWallet, generateQRCode, getAllTransactions, formatTransaction } = require('../../services/tron');
+const { getBalance, generateWallet, getAllTransactions, formatTransaction } = require('../../services/tron');
+const { generateQRCode } = require('../../utils/qrCode');
 const { getWalletsKeyboard, getBackToWalletsKeyboard, getWalletKeyboard, getBackToWalletAndWalletsKeyboard, getMainKeyboard } = require('../keyboards');
 const { sanitizeLabel } = require('../../utils/sanitize');
 const { sunToTRX, validateWalletOwnership, hasSufficientBalance} = require('../../utils/wallet');

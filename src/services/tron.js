@@ -1,5 +1,4 @@
 const { TronWeb } = require('tronweb');
-const QRCode = require('qrcode');
 const https = require('https');
 const { asAppError } = require('../utils/errors');
 const { getConfig } = require('../config');
@@ -256,34 +255,12 @@ function formatTransaction(ctx, tx, address) {
   };
 }
 
-/**
- * Generate QR code buffer from address
- */
-async function generateQRCode(address) {
-  try {
-    // Generate QR code as a buffer (PNG format)
-    const qrBuffer = await QRCode.toBuffer(address, {
-      type: 'png',
-      width: 300,
-      margin: 2,
-      color: {
-        dark: '#000000',
-        light: '#FFFFFF'
-      }
-    });
-    return qrBuffer;
-  } catch (error) {
-    throw asAppError(error, 'QR_GEN_FAILED', 'Could not generate QR code.');
-  }
-}
-
 module.exports = { 
   generateWallet, 
   getBalance, 
   sendTransaction, 
   isValidTronAddress,
   getAllTransactions,
-  formatTransaction,
-  generateQRCode
+  formatTransaction
 };
 

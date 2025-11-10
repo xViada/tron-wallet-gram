@@ -1,5 +1,6 @@
 const { Markup } = require('telegraf');
 const { getAvailableLanguages } = require('../utils/getAvailableLanguages');
+const db = require('../database/index.js');
 
 function getMainKeyboard(ctx) {
 	return Markup.inlineKeyboard([
@@ -14,14 +15,14 @@ function getMainKeyboard(ctx) {
  */
 function getWalletsKeyboard(ctx, wallets) {
 	const buttons = [];
-	
+
 	// Add buttons for each wallet
 	if (wallets && wallets.length > 0) {
 		// Sort wallets by created_at in ascending order (oldest first)
 		const sortedWallets = [...wallets].sort((a, b) => {
 			return new Date(a.created_at) - new Date(b.created_at);
 		});
-		
+
 		sortedWallets.forEach((wallet) => {
 			// Show label if available, otherwise show truncated address
 			const displayText = wallet.label || `${wallet.address.substring(0, 8)}...`;
@@ -33,11 +34,11 @@ function getWalletsKeyboard(ctx, wallets) {
 			]);
 		});
 	}
-	
+
 	// Add action buttons at the end
 	buttons.push([Markup.button.callback(ctx.t('buttons.create_wallet'), 'create_wallet')]);
 	buttons.push([Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')]);
-	
+
 	return Markup.inlineKeyboard(buttons);
 }
 
@@ -102,10 +103,15 @@ function getSuccesfullWithdrawKeyboard(ctx, transaction, wallet) {
 
 // Settings keyboard
 function getSettingsKeyboard(ctx) {
-	return Markup.inlineKeyboard([
-		[Markup.button.callback(ctx.t('buttons.change_bot_language'), 'change_language')],
-		[Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')],
-	]);
+	const buttons = [];
+	buttons.push([Markup.button.callback(ctx.t('buttons.change_bot_language'), 'change_language')]);
+	if (db.getUserTwoFactorAuthEnabled(ctx.from.id)) {
+		buttons.push([Markup.button.callback(ctx.t('buttons.disable_two_factor_auth'), 'disable_two_factor_auth')]);
+	} else {
+		buttons.push([Markup.button.callback(ctx.t('buttons.enable_two_factor_auth'), 'enable_two_factor_auth')]);
+	}
+	buttons.push([Markup.button.callback(ctx.t('buttons.back_to_main'), 'main')]);
+	return Markup.inlineKeyboard(buttons);
 }
 
 // Change language keyboard
@@ -125,17 +131,34 @@ function getInitialLanguageKeyboard() {
 	return Markup.inlineKeyboard(buttons);
 }
 
-module.exports = { 
+// Enable two factor auth keyboard
+function getEnableTwoFactorAuthKeyboard(ctx) {
+	return Markup.inlineKeyboard([
+		[Markup.button.callback(ctx.t('buttons.next_step'), '2fa_enable_next_step')],
+		[Markup.button.callback(ctx.t('buttons.cancel'), '2fa_enable_cancel')],
+	]);
+}
+
+// Disable two factor auth keyboard
+function getDisableTwoFactorAuthKeyboard(ctx) {
+	return Markup.inlineKeyboard([
+		[Markup.button.callback(ctx.t('buttons.cancel'), '2fa_disable_cancel')],
+	]);
+}
+
+module.exports = {
 	getMainKeyboard,
 	getWalletsKeyboardStatic,
-	getWalletsKeyboard, 
+	getWalletsKeyboard,
 	getBackToWalletsKeyboard,
 	getBackToWalletAndWalletsKeyboard,
-	getWalletKeyboard, 
+	getWalletKeyboard,
 	getSuccesfullWithdrawKeyboard,
 	getSettingsKeyboard,
 	getChangeLanguageKeyboard,
 	getInitialLanguageKeyboard,
 	getBackToSettingsKeyboard,
+	getEnableTwoFactorAuthKeyboard,
+	getDisableTwoFactorAuthKeyboard
 };
 

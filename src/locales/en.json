@@ -27,7 +27,10 @@
         "see_on_tronscan": "🔗 View on TronScan",
         "settings": "⚙️ Settings",
         "transactions": "🧾 Transactions",
-        "withdraw": "📤 Withdraw"
+        "withdraw": "📤 Withdraw",
+        "enable_two_factor_auth": "🔒 Enable Two Factor Authentication",
+        "disable_two_factor_auth": "🔒 Disable Two Factor Authentication",
+        "next_step": "🔒 Next Step"
     },
     "wallet": {
         "general": {
@@ -104,9 +107,25 @@
         }
     },
     "settings": {
-        "choose_language": "🌐 Choose your language:",
-        "language_change_error": "❌ Error changing language. Please try again.",
-        "language_change_invalid": "❌ Invalid language code.",
-        "language_changed": "✅ Language changed to {{language}}."
+        "language": {
+            "choose_language": "🌐 Choose your language:",
+            "language_change_error": "❌ Error changing language. Please try again.",
+            "language_change_invalid": "❌ Invalid language code.",
+            "language_change_title": "🌐 Change Language",
+            "language_changed": "✅ Language changed to {{language}}."
+        },
+        "two_factor_auth": {
+            "enable_message_first_step": "Please, use your authenticator app (e.g. Ente Authenticator, Google Authenticator...) to scan the QR code.\n\nOr enter this code manually:\n\n`{{secret}}`",
+            "enable_message_second_step": "Please, enter the code from your authenticator app:",
+            "enable_success": "✅ Two Factor Authentication enabled successfully.",
+            "enable_cancelled": "❌ Two Factor Authentication setup cancelled.",
+            "disable_message": "Please, enter the code from your authenticator app:",
+            "disable_cancelled": "❌ Two Factor Authentication disable cancelled.",
+            "disable_success": "✅ Two Factor Authentication disabled successfully.",
+            "disable_error": "❌ Error disabling Two Factor Authentication. Please try again.",
+            "verification_error": "❌ Error during verification. Please try again.",
+            "invalid_code_format": "❌ Invalid code format. Please enter a 6-digit code:",
+            "invalid_code": "❌ Invalid code. Please try again:"
+        }
     }
 }

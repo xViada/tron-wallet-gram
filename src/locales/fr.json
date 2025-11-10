@@ -27,7 +27,10 @@
         "see_on_tronscan": "🔗 Voir sur TronScan",
         "settings": "⚙️ Paramètres",
         "transactions": "🧾 Transactions",
-        "withdraw": "📤 Retirer"
+        "withdraw": "📤 Retirer",
+        "enable_two_factor_auth": "🔒 Activer l'Authentification à Deux Facteurs",
+        "disable_two_factor_auth": "🔒 Désactiver l'Authentification à Deux Facteurs",
+        "next_step": "🔒 Étape Suivante"
     },
     "wallet": {
         "general": {
@@ -104,10 +107,26 @@
         }
     },
     "settings": {
-        "choose_language": "🌐 Choisissez votre langue:",
-        "language_change_error": "❌ Erreur lors du changement de langue. Veuillez réessayer.",
-        "language_change_invalid": "❌ Code de langue invalide.",
-        "language_changed": "✅ Langue changée pour {{language}}."
+        "language": {
+            "choose_language": "🌐 Choisissez votre langue:",
+            "language_change_error": "❌ Erreur lors du changement de langue. Veuillez réessayer.",
+            "language_change_invalid": "❌ Code de langue invalide.",
+            "language_change_title": "🌐 Changer la Langue",
+            "language_changed": "✅ Langue changée pour {{language}}."
+        },
+        "two_factor_auth": {
+            "enable_message_first_step": "Veuillez utiliser votre application d'authentification (par exemple, Ente Authenticator, Google Authenticator...) pour scanner le code QR.\n\nOu entrez ce code manuellement:\n\n`{{secret}}`",
+            "enable_message_second_step": "Veuillez entrer le code de votre application d'authentification:",
+            "enable_success": "✅ Authentification à Deux Facteurs activée avec succès.",
+            "enable_cancelled": "❌ Configuration de l'Authentification à Deux Facteurs annulée.",
+            "disable_message": "Veuillez entrer le code de votre application d'authentification:",
+            "disable_cancelled": "❌ Désactivation de l'Authentification à Deux Facteurs annulée.",
+            "disable_success": "✅ Authentification à Deux Facteurs désactivée avec succès.",
+            "disable_error": "❌ Erreur lors de la désactivation de l'Authentification à Deux Facteurs. Veuillez réessayer.",
+            "verification_error": "❌ Erreur lors de la vérification. Veuillez réessayer.",
+            "invalid_code_format": "❌ Format de code invalide. Veuillez entrer un code à 6 chiffres:",
+            "invalid_code": "❌ Code invalide. Veuillez réessayer:"
+        }
     }
 }
 

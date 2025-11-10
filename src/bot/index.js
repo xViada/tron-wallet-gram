@@ -22,10 +22,17 @@ const {
 	handleChangeLabel,
 	handleCancelLabelChange,
 	handleTransactions,
-	handleDeposit,
+	handleDeposit
 } = require('./handlers/walletActions');
-const { handleSettings, handleChangeLanguage, handleLanguageSelection, handleInitialLanguageSelection } = require('./handlers/settingsActions');
-const { withdrawalScene, labelChangeScene, walletDeleteScene } = require('./scenes');
+const {
+	handleSettings,
+	handleChangeLanguage,
+	handleLanguageSelection,
+	handleInitialLanguageSelection,
+	handleEnableTwoFactorAuth,
+	handleDisableTwoFactorAuth
+} = require('./handlers/settingsActions');
+const { withdrawalScene, labelChangeScene, walletDeleteScene, enableTwoFactorAuthScene, disableTwoFactorAuthScene } = require('./scenes');
 
 /**
  * Initialize and configure the bot
@@ -45,6 +52,8 @@ function createBot() {
 		withdrawalScene,
 		labelChangeScene,
 		walletDeleteScene,
+		enableTwoFactorAuthScene,
+		disableTwoFactorAuthScene,
 	]);
 	
 	// Create database-backed session store
@@ -90,6 +99,8 @@ function createBot() {
 	bot.action('change_language', handleChangeLanguage);
 	bot.action(/^change_language_(\w+)$/, handleLanguageSelection);
 	bot.action(/^initial_language_(\w+)$/, handleInitialLanguageSelection);
+	bot.action('enable_two_factor_auth', handleEnableTwoFactorAuth);
+	bot.action('disable_two_factor_auth', handleDisableTwoFactorAuth);
 	return bot;
 }
 

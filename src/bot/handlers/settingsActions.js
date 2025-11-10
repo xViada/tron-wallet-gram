@@ -22,7 +22,7 @@ async function handleSettings(ctx) {
  */
 async function handleChangeLanguage(ctx) {
 	await ctx.answerCbQuery();
-	const keyboard = getChangeLanguageKeyboard(ctx);	
+	const keyboard = getChangeLanguageKeyboard(ctx);
 	await safeEditOrSend(ctx, ctx.t('settings.choose_language'), keyboard);
 }
 
@@ -33,7 +33,7 @@ async function handleLanguageSelection(ctx) {
 	await ctx.answerCbQuery();
 	const languageCode = ctx.match[1]; // 'en' or 'es'
 	const userId = ctx.from.id;
-	
+
 	const language = getAvailableLanguages().find(lang => lang.code === languageCode);
 	if (!language) {
 		await safeEditOrSend(ctx, ctx.t('settings.language_change_invalid'), getBackToSettingsKeyboard(ctx));
@@ -42,7 +42,7 @@ async function handleLanguageSelection(ctx) {
 	try {
 		// Update user's language preference in database
 		const success = db.updateUserLanguageCode(userId, language.code);
-		
+
 		if (success) {
 			const i18next = require('../../config/i18n');
 			ctx.t = (key, options = {}) => i18next.t(key, { lng: language.code, ...options });
@@ -72,7 +72,7 @@ async function handleInitialLanguageSelection(ctx) {
 	await ctx.answerCbQuery();
 	const languageCode = ctx.match[1]; // 'en' or 'es'
 	const userId = ctx.from.id;
-	
+
 	const language = getAvailableLanguages().find(lang => lang.code === languageCode);
 	if (!language) {
 		// Fallback to English if invalid language
@@ -86,16 +86,16 @@ async function handleInitialLanguageSelection(ctx) {
 		);
 		return;
 	}
-	
+
 	try {
 		// Update user's language preference in database
 		const success = db.updateUserLanguageCode(userId, language.code);
-		
+
 		if (success) {
 			// Update ctx.t to use the new language
 			const i18next = require('../../config/i18n');
 			ctx.t = (key, options = {}) => i18next.t(key, { lng: language.code, ...options });
-			
+
 			const userName = ctx.from.first_name || 'there';
 			await safeEditOrSend(ctx,
 				ctx.t('commands.start', { userName }),
@@ -124,9 +124,28 @@ async function handleInitialLanguageSelection(ctx) {
 	}
 }
 
+/**
+ * Handle enable two factor auth action - enter enable two factor auth scene
+ */
+async function handleEnableTwoFactorAuth(ctx) {
+	await ctx.answerCbQuery();
+	
+	ctx.scene.enter('enableTwoFactorAuth');
+}
+
+/**
+ * Handle disable two factor auth action - enter disable two factor auth scene
+ */
+async function handleDisableTwoFactorAuth(ctx) {
+	await ctx.answerCbQuery();
+	ctx.scene.enter('disableTwoFactorAuth');
+}
+
 module.exports = {
 	handleSettings,
 	handleChangeLanguage,
 	handleLanguageSelection,
 	handleInitialLanguageSelection,
+	handleEnableTwoFactorAuth,
+	handleDisableTwoFactorAuth,
 };

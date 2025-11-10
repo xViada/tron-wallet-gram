@@ -5,9 +5,9 @@ const { getConfig } = require('../config');
 
 // Initialize database connection
 const config = getConfig();
-const dbPath = path.isAbsolute(config.databasePath) 
-  ? config.databasePath 
-  : path.join(__dirname, '..', '..', config.databasePath);
+const dbPath = path.isAbsolute(config.databasePath)
+    ? config.databasePath
+    : path.join(__dirname, '..', '..', config.databasePath);
 const db = new Database(dbPath);
 
 // Create users table if it doesn't exist
@@ -18,6 +18,8 @@ db.exec(`
         first_name TEXT,
         last_name TEXT,
         language_code TEXT,
+        two_factor_auth_secret TEXT DEFAULT NULL,
+        two_factor_auth_enabled BOOLEAN DEFAULT FALSE,
         joined_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
 `);
@@ -75,6 +77,11 @@ const insertUser = db.prepare(`
 const getUserByIdStmt = db.prepare('SELECT * FROM users WHERE user_id = ?');
 const updateUserLanguageCodeStmt = db.prepare('UPDATE users SET language_code = ? WHERE user_id = ?');
 const getUserLanguageCodeStmt = db.prepare('SELECT language_code FROM users WHERE user_id = ?');
+const getUserTwoFactorAuthSecretStmt = db.prepare('SELECT two_factor_auth_secret FROM users WHERE user_id = ?');
+const updateUserTwoFactorAuthSecretStmt = db.prepare('UPDATE users SET two_factor_auth_secret = ? WHERE user_id = ?');
+const deleteUserTwoFactorAuthSecretStmt = db.prepare('UPDATE users SET two_factor_auth_secret = NULL WHERE user_id = ?');
+const updateUserTwoFactorAuthEnabledStmt = db.prepare('UPDATE users SET two_factor_auth_enabled = ? WHERE user_id = ?');
+const getUserTwoFactorAuthEnabledStmt = db.prepare('SELECT two_factor_auth_enabled FROM users WHERE user_id = ?');
 
 // Wallet prepared statements
 const insertWallet = db.prepare(`
@@ -173,7 +180,53 @@ const dbFunctions = {
             return null;
         }
     },
-    
+
+    // Get a user two factor auth secret
+    getUserTwoFactorAuthSecret(userId) {
+        try {
+            const result = getUserTwoFactorAuthSecretStmt.get(userId);
+            return result ? result.two_factor_auth_secret : null;
+        } catch (error) {
+            logger.error('DB error: getUserTwoFactorAuthSecret failed', { error, userId });
+            return null;
+        }
+    },
+
+    // Update a user two factor auth secret
+    updateUserTwoFactorAuthSecret(userId, twoFactorAuthSecret) {
+        try {
+            updateUserTwoFactorAuthSecretStmt.run(twoFactorAuthSecret, userId);
+            return true;
+        } catch (error) {
+            logger.error('DB error: updateUserTwoFactorAuthSecret failed', { error, userId });
+            return false;
+        }
+    },
+
+    // Update a user two factor auth enabled
+    updateUserTwoFactorAuthEnabled(userId, twoFactorAuthEnabled) {
+        try {
+            // Convert boolean to integer (1 for true, 0 for false) for SQLite
+            const value = twoFactorAuthEnabled ? 1 : 0;
+            updateUserTwoFactorAuthEnabledStmt.run(value, userId);
+            return true;
+        } catch (error) {
+            logger.error('DB error: updateUserTwoFactorAuthEnabled failed', { error, userId });
+            return false;
+        }
+    },
+
+    // Get a user two factor auth enabled
+    getUserTwoFactorAuthEnabled(userId) {
+        try {
+            const result = getUserTwoFactorAuthEnabledStmt.get(userId);
+            return result ? result.two_factor_auth_enabled : false;
+        } catch (error) {
+            logger.error('DB error: getUserTwoFactorAuthEnabled failed', { error, userId });
+            return false;
+        }
+    },
+
     // Add a wallet for a user and return the inserted row
     addWallet({ userId, address, addressHex, privateKey, label }) {
         try {
